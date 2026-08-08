@@ -1,0 +1,8 @@
+title = "Custom Gitleaks Rules"
+
+[[rules]]
+id = "terraform-secrets"
+description = "Detect Terraform secrets"
+regex = '''(?i)(admin_password|password|client_secret|client_id|access_key|secret_key|api_key|token)\s*=\s*["'][^"']+["']'''
+secretGroup = 0
+tags = ["terraform", "secrets"]
