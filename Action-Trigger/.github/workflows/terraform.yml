@@ -11,7 +11,7 @@ on:
       - main
 
 env:
-  TF_WORKING_DIR: ./Enviroment/Devlopment
+  TF_WORKING_DIR: ./Action-Trigger/Enviroment/Devlopment
 
 permissions:
   contents: read
@@ -95,9 +95,9 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: 7a8e96d0-1e46-4e44-8553-7598eef4f67e
+          tenant-id: 093e9319-5648-4618-8c7d-f585fb2ed3f9
+          subscription-id: 2eeb0869-d474-4f94-a0b0-fb6a5d23d142
 
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
