@@ -14,6 +14,7 @@ env:
   TF_WORKING_DIR: ./Action-Trigger/Enviroment/Devlopment
 
 permissions:
+  id-token: write
   contents: read
 
 jobs:
