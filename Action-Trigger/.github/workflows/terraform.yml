@@ -6,29 +6,24 @@ on:
       - feature
       - main
 
-  pull_request:
-    branches:
-      - main
+permissions:
+  contents: read
 
 env:
-  TF_WORKING_DIR: ./Action-Trigger/Enviroment/Devlopment
-
-permissions:
-  id-token: write
-  contents: read
+  TF_WORKING_DIR: ./Enviroment/Devlopment
 
 jobs:
 
-  # ==========================================
-  # PLAN
-  # Feature push  -> Plan
-  # PR to main    -> Plan
-  # Main push     -> Plan
-  # ==========================================
+  # ==================================================
+  # TERRAFORM PLAN
+  # Only feature branch
+  # ==================================================
 
   terraform-plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/heads/feature'
 
     steps:
 
@@ -43,9 +38,13 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: "7a8e96d0-1e46-4e44-8553-7598eef4f67e"
-          tenant-id: "093e9319-5648-4618-8c7d-f585fb2ed3f9"
-          subscription-id: "2eeb0869-d474-4f94-a0b0-fb6a5d23d142"
+          creds: |
+            {
+              "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
+              "clientSecret": "YOUR_CLIENT_SECRET",
+              "subscriptionId": "2eeb0869-d474-4f94-a0b0-fb6a5d23d142",
+              "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
+            }
 
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -53,7 +52,7 @@ jobs:
 
       - name: Terraform Format Check
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform fmt -check
+        run: terraform fmt -check -recursive
 
       - name: Terraform Validate
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -64,22 +63,18 @@ jobs:
         run: terraform plan
 
 
-  # ==========================================
-  # APPLY
-  # ONLY MAIN BRANCH PUSH
-  # ==========================================
+  # ==================================================
+  # TERRAFORM APPLY
+  # Only main branch
+  # ==================================================
 
   terraform-apply:
     name: Terraform Apply
-
-    needs: terraform-plan
-
-    if: >
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main'
-
     runs-on: ubuntu-latest
 
+    if: github.ref == 'refs/heads/main'
+
+    # Manual approval before Apply
     environment:
       name: production
 
@@ -96,9 +91,13 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: "7a8e96d0-1e46-4e44-8553-7598eef4f67e"
-          tenant-id: "093e9319-5648-4618-8c7d-f585fb2ed3f9"
-          subscription-id: "2eeb0869-d474-4f94-a0b0-fb6a5d23d142"
+          creds: |
+            {
+              "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
+              "clientSecret": "YOUR_CLIENT_SECRET",
+              "subscriptionId": "2eeb0869-d474-4f94-a0b0-fb6a5d23d142",
+              "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
+            }
 
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
