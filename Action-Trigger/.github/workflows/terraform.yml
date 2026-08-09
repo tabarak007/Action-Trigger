@@ -14,8 +14,8 @@ env:
   TF_WORKING_DIR: ./Enviroment/Devlopment
 
 permissions:
-  contents: write
-  pull-requests: write
+  permissions:
+  contents: read
 
 jobs:
 
