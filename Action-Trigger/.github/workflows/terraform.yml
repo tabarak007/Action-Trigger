@@ -16,7 +16,7 @@ jobs:
 
   # ==================================================
   # TERRAFORM PLAN
-  # Runs only when code is pushed to feature branch
+  # Feature branch push -> Plan
   # ==================================================
 
   terraform-plan:
@@ -27,22 +27,17 @@ jobs:
 
     steps:
 
-      # Checkout
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8
 
-      # Azure Login
-      # App Registration + Client Secret
       - name: Azure Login
         uses: azure/login@v2
         with:
-        auth-type: SERVICE_PRINCIPAL
           creds: |
             {
               "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
@@ -51,22 +46,18 @@ jobs:
               "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
             }
 
-      # Terraform Init
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
-      # Terraform Format
       - name: Terraform Format Check
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform fmt -check -recursive
 
-      # Terraform Validate
       - name: Terraform Validate
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
-      # Terraform Plan
       - name: Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan
@@ -74,7 +65,7 @@ jobs:
 
   # ==================================================
   # TERRAFORM APPLY
-  # Runs only when code is pushed to main branch
+  # Main branch push -> Apply
   # ==================================================
 
   terraform-apply:
@@ -83,28 +74,22 @@ jobs:
 
     if: github.ref == 'refs/heads/main'
 
-    # Manual approval before Apply
     environment:
       name: production
 
     steps:
 
-      # Checkout
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8
 
-      # Azure Login
-      # App Registration + Client Secret
       - name: Azure Login
         uses: azure/login@v2
         with:
-        auth-type: SERVICE_PRINCIPAL
           creds: |
             {
               "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
@@ -113,12 +98,10 @@ jobs:
               "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
             }
 
-      # Terraform Init
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
-      # Terraform Apply
       - name: Terraform Apply
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform apply -auto-approve
