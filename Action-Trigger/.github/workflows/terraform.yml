@@ -16,7 +16,7 @@ jobs:
 
   # ==================================================
   # TERRAFORM PLAN
-  # Feature branch push -> Plan
+  # Only feature branch
   # ==================================================
 
   terraform-plan:
@@ -41,7 +41,7 @@ jobs:
           creds: |
             {
               "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
-              "clientSecret": "PR58Q~cL6NhdMfvNmgSm.qm8OX6qCQy~7cP47cy0",
+              "clientSecret": "YOUR_CLIENT_SECRET",
               "subscriptionId": "2eeb0869-d474-4f94-a0b0-fb6a5d23d142",
               "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
             }
@@ -65,7 +65,7 @@ jobs:
 
   # ==================================================
   # TERRAFORM APPLY
-  # Main branch push -> Apply
+  # Only main branch
   # ==================================================
 
   terraform-apply:
@@ -74,6 +74,7 @@ jobs:
 
     if: github.ref == 'refs/heads/main'
 
+    # Manual approval before Apply
     environment:
       name: production
 
@@ -93,7 +94,7 @@ jobs:
           creds: |
             {
               "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
-              "clientSecret": "PR58Q~cL6NhdMfvNmgSm.qm8OX6qCQy~7cP47cy0",
+              "clientSecret": "YOUR_CLIENT_SECRET",
               "subscriptionId": "2eeb0869-d474-4f94-a0b0-fb6a5d23d142",
               "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
             }
