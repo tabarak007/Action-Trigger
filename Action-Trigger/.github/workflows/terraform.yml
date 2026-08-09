@@ -14,10 +14,11 @@ env:
 
 jobs:
 
-  # ==========================================
+  # ==================================================
   # TERRAFORM PLAN
-  # Feature branch only
-  # ==========================================
+  # Runs only when code is pushed to feature branch
+  # ==================================================
+
   terraform-plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
@@ -26,15 +27,18 @@ jobs:
 
     steps:
 
+      # Checkout
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8
 
       # Azure Login
+      # App Registration + Client Secret
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -46,44 +50,56 @@ jobs:
               "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
             }
 
+      # Terraform Init
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
+      # Terraform Format
       - name: Terraform Format Check
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform fmt -check -recursive
 
+      # Terraform Validate
       - name: Terraform Validate
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
+      # Terraform Plan
       - name: Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan
 
 
-  # ==========================================
+  # ==================================================
   # TERRAFORM APPLY
-  # Main branch only
-  # ==========================================
+  # Runs only when code is pushed to main branch
+  # ==================================================
+
   terraform-apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
 
     if: github.ref == 'refs/heads/main'
 
+    # Manual approval before Apply
+    environment:
+      name: production
+
     steps:
 
+      # Checkout
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8
 
       # Azure Login
+      # App Registration + Client Secret
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -95,10 +111,12 @@ jobs:
               "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
             }
 
+      # Terraform Init
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
+      # Terraform Apply
       - name: Terraform Apply
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform apply -auto-approve
