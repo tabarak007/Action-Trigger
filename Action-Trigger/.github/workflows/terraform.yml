@@ -47,7 +47,7 @@ jobs:
           creds: |
             {
               "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
-              "clientSecret": "TNq8Q~J7bCxyoQN.ZxdVnUZLhfVZFUhPn~Hq~a-B",
+              "clientSecret": "IoP8Q~5ow24vBdtKJiyNzHy9xsziAx4Gl9TGHc.P",
               "subscriptionId": "2eeb0869-d474-4f94-a0b0-fb6a5d23d142",
               "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
             }
@@ -134,7 +134,7 @@ jobs:
           creds: |
             {
               "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
-              "clientSecret": "TNq8Q~J7bCxyoQN.ZxdVnUZLhfVZFUhPn~Hq~a-B",
+              "clientSecret": "IoP8Q~5ow24vBdtKJiyNzHy9xsziAx4Gl9TGHc.P",
               "subscriptionId": "2eeb0869-d474-4f94-a0b0-fb6a5d23d142",
               "tenantId": "093e9319-5648-4618-8c7d-f585fb2ed3f9"
             }
