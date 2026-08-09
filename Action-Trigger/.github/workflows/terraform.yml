@@ -10,19 +10,17 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 env:
   TF_WORKING_DIR: ./Enviroment/Devlopment
 
-permissions:
-  permissions:
-  contents: read
-
 jobs:
 
-  # ==========================================================
-  # FEATURE / PR - TERRAFORM PLAN
-  # ==========================================================
-
+  # ==========================================
+  # TERRAFORM PLAN
+  # ==========================================
   terraform-plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
@@ -37,10 +35,12 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-      # ======================================================
-      # AZURE LOGIN USING CLIENT SECRET
-      # ======================================================
-
+      # ==========================================
+      # AZURE LOGIN
+      # App Registration + Client Secret
+      # NO GitHub Secret
+      # NO Federated Credential
+      # ==========================================
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -58,7 +58,7 @@ jobs:
 
       - name: Terraform Format Check
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform fmt -check
+        run: terraform fmt -check -recursive
 
       - name: Terraform Validate
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -69,50 +69,23 @@ jobs:
         run: terraform plan
 
 
-  # ==========================================================
-  # AUTOMATIC PR
-  # FEATURE → MAIN
-  # ==========================================================
-
-  create-pr:
-    name: Create PR Feature to Main
-
+  # ==========================================
+  # TERRAFORM APPLY
+  # ONLY MAIN BRANCH
+  # ==========================================
+  terraform-apply:
+    name: Terraform Apply
     needs: terraform-plan
 
     if: >
       github.event_name == 'push' &&
-      github.ref == 'refs/heads/feature'
-
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Create Pull Request
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-        run: |
-          gh pr create \
-            --base main \
-            --head feature \
-            --title "Terraform Changes - Feature to Main" \
-            --body "Automatic PR created after successful Terraform Plan."
-
-        continue-on-error: true
-
-
-  # ==========================================================
-  # MAIN BRANCH - TERRAFORM PLAN
-  # ==========================================================
-
-  terraform-main-plan:
-    name: Terraform Plan - Main
-
-    runs-on: ubuntu-latest
-
-    if: >
-      github.event_name == 'push' &&
       github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    # Manual approval before Apply
+    environment:
+      name: production
 
     steps:
 
@@ -124,10 +97,9 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-      # ======================================================
-      # AZURE LOGIN USING CLIENT SECRET
-      # ======================================================
-
+      # ==========================================
+      # AZURE LOGIN
+      # ==========================================
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -143,76 +115,6 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
-      - name: Terraform Validate
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform validate
-
-      - name: Terraform Plan
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform plan -out=tfplan
-
-      - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v4
-        with:
-          name: terraform-plan
-          path: ${{ env.TF_WORKING_DIR }}/tfplan
-
-
-  # ==========================================================
-  # APPLY
-  # MAIN → MANUAL APPROVAL → APPLY
-  # ==========================================================
-
-  terraform-apply:
-    name: Terraform Apply
-
-    needs: terraform-main-plan
-
-    if: >
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main'
-
-    runs-on: ubuntu-latest
-
-    # Manual approval
-    environment:
-      name: production
-
-    steps:
-
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.9.8
-
-      # ======================================================
-      # AZURE LOGIN USING CLIENT SECRET
-      # ======================================================
-
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: |
-            {
-              "clientId": "${{ secrets.AZURE_CLIENT_ID }}",
-              "clientSecret": "${{ secrets.AZURE_CLIENT_SECRET }}",
-              "subscriptionId": "${{ secrets.AZURE_SUBSCRIPTION_ID }}",
-              "tenantId": "${{ secrets.AZURE_TENANT_ID }}"
-            }
-
-      - name: Terraform Init
-        working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init
-
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v4
-        with:
-          name: terraform-plan
-          path: ${{ env.TF_WORKING_DIR }}
-
       - name: Terraform Apply
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve
