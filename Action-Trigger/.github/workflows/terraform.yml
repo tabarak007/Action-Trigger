@@ -44,6 +44,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
+          auth-type: SERVICE_PRINCIPAL
           creds: |
             {
               "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
@@ -103,6 +104,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
+          auth-type: SERVICE_PRINCIPAL
           creds: |
             {
               "clientId": "7a8e96d0-1e46-4e44-8553-7598eef4f67e",
